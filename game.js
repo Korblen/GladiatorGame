@@ -9,6 +9,10 @@ export class Game {
     
         this.characters.forEach(character => {
             if (character.isAlive()) {
+                if (character.poisoned){
+                    character.takeDamage(2);
+                    console.log(`${character.name} est empoisonné et perd 2 points de vie.`);
+                }
                 if (character.isPlayer) {
                     // Interaction avec le joueur via la console
                     this.playerTurnConsole(character);
@@ -48,10 +52,21 @@ export class Game {
                 character.dealDamage(target);
                 break;
             case '2':
-                if (character.mana >= character.specialAttackManaCost) {
+                // Adapter l'attaque spéciale selon la classe du personnage
+                if (character.constructor.name === 'Ranger') {
+                    const aliveTargets = this.characters.filter(target => target.isAlive() && target !== character);
+                    console.log(`${character.name} choisit d'utiliser son attaque spéciale sur ${aliveTargets.map(t => t.name).join(', ')}`);
+                    character.special(aliveTargets);
+                }
+                else if (character.constructor.name === 'Monk' || character.constructor.name === 'Berzerker') {
+                    console.log(`${character.name} choisit d'utiliser son attaque spéciale`);
+                    character.special();
+                }
+                else if (character.mana >= character.specialAttackManaCost) {
                     console.log(`${character.name} choisit d'utiliser son attaque spéciale sur ${target.name}`);
                     character.special(target);
-                } else {
+                }
+                else {
                     console.log(`${character.name} n'a pas assez de mana pour l'attaque spéciale. Attaque normale utilisée.`);
                     character.dealDamage(target);
                 }
@@ -61,19 +76,35 @@ export class Game {
         }
     }
     
+    
     npcTurn(character) {
         const targets = this.characters.filter(target => target.isAlive() && target !== character);
-        const target = targets[Math.floor(Math.random() * targets.length)];
-        const useSpecial = Math.random() < 0.5;
+        
+        // Évaluer les cibles potentielles en fonction de leur menace et de leur vulnérabilité
+        const evaluatedTargets = targets.map(target => {
+            const threatLevel = target.dmg; // Le niveau de menace peut être basé sur les dégâts potentiels de la cible
+            const vulnerability = target.hp; // La vulnérabilité peut être basée sur les points de vie restants
+            return { target, score: vulnerability - threatLevel }; // Un score basé sur la vulnérabilité moins la menace
+        });
     
-        if (useSpecial && character.mana >= character.specialManaCost) {
-            console.log(`${character.name} choisit d'utiliser son attaque spéciale sur ${target.name}`);
-            character.specialAttack(target);
+        // Trier les cibles évaluées par score, les cibles les plus vulnérables et moins menaçantes en premier
+        evaluatedTargets.sort((a, b) => a.score - b.score);
+    
+        // Sélectionner la cible la plus intéressante (première de la liste triée)
+        const { target } = evaluatedTargets[0];
+    
+        // Décider aléatoirement d'utiliser l'attaque spéciale ou non
+        const useSpecial = Math.random() < 0.5 && character.mana >= character.specialAttackManaCost;
+    
+        if (useSpecial) {
+            // Adapter selon la classe du personnage pour l'attaque spéciale
+            handleSpecialAttack(character, target, targets);
         } else {
             console.log(`${character.name} choisit d'attaquer ${target.name}`);
             character.dealDamage(target);
         }
     }
+ 
     
 
     skipTurn() {
@@ -97,5 +128,21 @@ export class Game {
         while (this.turnLeft > 0 && this.characters.length > 1) {
             this.startTurn();
         }
+    }
+}
+
+function handleSpecialAttack(character, target, allTargets) {
+    if (character.constructor.name === 'Ranger') {
+        // Le Ranger attaque tous les adversaires vivants
+        console.log(`${character.name} utilise son attaque spéciale sur tous les adversaires.`);
+        character.special(allTargets);
+    } else if (character.constructor.name === 'Monk' || character.constructor.name === 'Berzerker') {
+        // Le Moine et le Berzerker utilisent leur capacité spéciale sans cible spécifique
+        console.log(`${character.name} utilise son attaque spéciale.`);
+        character.special();
+    } else {
+        // Pour les autres classes, utiliser l'attaque spéciale sur la cible sélectionnée
+        console.log(`${character.name} utilise son attaque spéciale sur ${target.name}.`);
+        character.special(target);
     }
 }

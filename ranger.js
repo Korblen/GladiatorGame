@@ -4,6 +4,7 @@ export class Ranger extends Character {
     constructor(name, isPlayer) {
         super(name, 9, 3, 120, isPlayer); // hp, dmg, mana, isPlayer
         this.specialAttackManaCost = 30;
+        this.dodgeChance = 0.5;
     }
     specialManaCost() {
         return this.specialAttackManaCost;

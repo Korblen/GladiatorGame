@@ -72,5 +72,8 @@ function startGameWithCharacter(selectedCharacterType) {
     }
 
     const game = new Game(characters);
+    game.characters.forEach(character => {
+        console.log(`${character.name} est un ${character.constructor.name}`);
+    });
     game.startGame();
 }
