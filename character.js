@@ -1,24 +1,28 @@
 export class Character {
-    constructor(name, hp, dmg) {
+    constructor(name, hp, dmg, mana) {
         this.name = name;
         this.hp = hp;
         this.dmg = dmg;
+        this.mana = mana;
+        this.status = 'playing'; // 'playing', 'loser', 'winner'
     }
 
-    attack(target) {
-        target.takeDamage(this.dmg);
-        console.log(`${this.name} attaque ${target.name} et inflige ${this.dmg} points de dégâts.`);
-    }
-
-    takeDamage(dmg) {
-        this.hp -= dmg;
-        console.log(`${this.name} reçoit ${dmg} points de dégâts. Points de vie restants: ${this.hp}`);
+    takeDamage(damage) {
+        this.hp -= damage;
         if (this.hp <= 0) {
-            console.log(`${this.name} est vaincu.`);
+            this.status = 'loser';
+            this.hp = 0;
+        }
+    }
+
+    dealDamage(target) {
+        target.takeDamage(this.dmg);
+        if (target.status === 'loser') {
+            this.mana += 20;
         }
     }
 
     isAlive() {
-        return this.hp > 0;
+        return this.status === 'playing';
     }
 }

@@ -1,27 +1,57 @@
-import { Character } from './character.js';
-
 export class Game {
-    constructor(hero, enemy) {
-        this.hero = hero;
-        this.enemy = enemy;
-        this.currentTurn = 1;
+    constructor(characters) {
+        this.characters = characters.filter(character => character.isAlive());
+        this.turnLeft = 10;
     }
 
-    start() {
-        console.log("Le jeu commence !");
-        while (this.hero.isAlive() && this.enemy.isAlive()) {
-            console.log(`Tour ${this.currentTurn}:`);
-            this.hero.attack(this.enemy);
-            if (this.enemy.isAlive()) {
-                this.enemy.attack(this.hero);
-            }
-            this.currentTurn++;
-        }
+    startTurn() {
+        console.log(`C'est le tour ${11 - this.turnLeft}`);
 
-        if (this.hero.isAlive()) {
-            console.log(`${this.hero.name} a gagné le combat !`);
+        this.characters.forEach(character => {
+            if (character.isAlive()) {
+                // Choisis une cible au hasard parmi les personnages vivants autres que l'attaquant
+                const targets = this.characters.filter(target => target.isAlive() && target !== character);
+                const target = targets[Math.floor(Math.random() * targets.length)];
+
+                // Décide aléatoirement de l'attaque à utiliser (normal ou spécial)
+                const useSpecial = Math.random() < 0.5;
+
+                if (useSpecial && character.mana >= character.specialManaCost) {
+                    console.log(`${character.name} choisit d'utiliser son attaque spéciale sur ${target.name}`);
+                    character.specialAttack(target);
+                } else {
+                    console.log(`${character.name} choisit d'attaquer ${target.name}`);
+                    character.dealDamage(target);
+                }
+            }
+        });
+
+        // Filtrer les personnages encore en vie après les attaques
+        this.characters = this.characters.filter(character => character.isAlive());
+
+        this.skipTurn();
+    }
+
+    skipTurn() {
+        this.turnLeft--;
+        if (this.turnLeft === 0 || this.characters.length <= 1) {
+            this.endGame();
+        }
+    }
+
+    endGame() {
+        if (this.characters.length === 1) {
+            const winner = this.characters[0];
+            winner.status = 'winner';
+            console.log(`${winner.name} a gagné le jeu !`);
         } else {
-            console.log(`${this.enemy.name} a gagné le combat !`);
+            console.log("Le jeu est terminé sans vainqueur clair.");
+        }
+    }
+
+    startGame() {
+        while (this.turnLeft > 0 && this.characters.length > 1) {
+            this.startTurn();
         }
     }
 }
