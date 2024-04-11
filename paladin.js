@@ -1,12 +1,15 @@
 import { Character } from './character.js';
 
 export class Paladin extends Character {
-    constructor(name) {
-        super(name, 16, 3, 160);
+    constructor(name, isPlayer) {
+        super(name, 16, 3, 160, isPlayer);
+        this.specialAttackManaCost = 40;
     }
-
-    healingLighting(target) {
-        if (this.mana >= 40) {
+    specialManaCost() {
+        return this.specialAttackManaCost;
+    }
+    special(target) {
+        if (this.mana >= this.specialManaCost()) {
             console.log(`${this.name} utilise Healing Lighting sur ${target.name}`);
             target.takeDamage(4);
             this.hp += 5; // Le Paladin se soigne de 5 points de vie.

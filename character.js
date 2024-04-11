@@ -1,10 +1,11 @@
 export class Character {
-    constructor(name, hp, dmg, mana) {
+    constructor(name, hp, dmg, mana, isPlayer = false) {
         this.name = name;
         this.hp = hp;
         this.dmg = dmg;
         this.mana = mana;
         this.status = 'playing'; // 'playing', 'loser', 'winner'
+        this.isPlayer = isPlayer;
     }
 
     takeDamage(damage) {
@@ -14,6 +15,7 @@ export class Character {
             this.hp = 0;
         }
     }
+
 
     dealDamage(target) {
         target.takeDamage(this.dmg);

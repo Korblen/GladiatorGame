@@ -1,12 +1,17 @@
 import { Character } from './character.js';
 
 export class Assassin extends Character {
-    constructor(name) {
-        super(name, 6, 6, 20);
+    constructor(name, isPlayer) {
+        super(name, 6, 6, 20, isPlayer);
+        this.specialAttackManaCost = 20;
     }
 
-    shadowHit(target) {
-        if (this.mana >= 20) {
+    specialManaCost() {
+        return this.specialAttackManaCost;
+    }
+
+    special(target) {
+        if (this.mana >= this.specialManaCost()) {
             console.log(`${this.name} utilise Shadow Hit sur ${target.name}`);
             target.takeDamage(7); // L'Assassin inflige 7 points de dégâts.
             this.mana -= 20;

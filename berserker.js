@@ -1,11 +1,16 @@
 import { Character } from './character.js';
 
 export class Berzerker extends Character {
-    constructor(name) {
-        super(name, 8, 4, 0); // Notez que le Berzerker commence sans mana.
+    constructor(name, isPlayer) {
+        super(name, 8, 4, 0, isPlayer);
+        this.specialAttackManaCost = 0; // Notez que le Berzerker commence sans mana.
+    }
+    
+    specialManaCost() {
+        return this.specialAttackManaCost;
     }
 
-    rage() {
+    special() {
         console.log(`${this.name} utilise Rage.`);
         this.dmg += 1; // L'attaque du Berzerker augmente de 1.
         this.hp -= 1; // Le Berzerker perd 1 point de vie en utilisant Rage.

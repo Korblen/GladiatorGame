@@ -1,12 +1,16 @@
 import { Character } from './character.js';
 
 export class Monk extends Character {
-    constructor(name) {
-        super(name, 8, 2, 200);
+    constructor(name, isPlayer) {
+        super(name, 8, 2, 200, isPlayer);
+        this.specialAttackManaCost = 25;
+    }
+    specialManaCost() {
+        return this.specialAttackManaCost;
     }
 
-    heal() {
-        if (this.mana >= 25) {
+    special() {
+        if (this.mana >= this.specialManaCost()) {
             console.log(`${this.name} utilise Heal.`);
             this.hp += 8; // Le Monk se soigne de 8 points de vie.
             console.log(`${this.name} se soigne de 8 points de vie.`);
